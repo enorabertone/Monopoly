@@ -1,0 +1,73 @@
+public class Player
+    {
+        //Attributes
+        public int id { get; set; }
+        public string name { get; set; }
+        public int position { get; set; }
+        public Game game { get;}
+
+        //Constructors
+        public Player(int id, string name, Game game)
+        {
+            this.id = id;
+            this.name = name;
+            position = 0;
+            this.game = game;
+        }
+
+        //Methods
+        public void Move(int number)
+        {
+            position += number;
+            if (position > 39)
+            {
+                position -= 40;
+            }
+        }
+
+        public void PlayTurn()
+        {
+            Console.Clear();
+            bool replay = true;
+            int doubleCounter = 0;
+
+            while(replay)
+            {
+                //Roll dices
+                int firstDie = game.dice.Roll();
+                int secondDie = game.dice.Roll();
+                Console.WriteLine($"You rolled a {firstDie} and {secondDie} --> {firstDie + secondDie}\n");
+                game.interaction.Pause();
+
+                //Verify if it's a double
+                if (firstDie == secondDie)
+                {
+                    doubleCounter++;
+
+                    if (doubleCounter == 3)
+                    {
+                        Console.WriteLine("You've made three double in a row : You're going straight to jail !");
+                        // Go to Jail action
+                        replay = false;
+                        return;
+                    }
+                    else
+                        Console.WriteLine("It's a double so you will replay after this turn !");
+                }
+                else
+                    replay = false;
+
+                // Move the player
+                Console.WriteLine("Ancient position: " + position);
+                Move(firstDie + secondDie);
+                Console.WriteLine("New position: " + position);
+
+                //Do the action on the Board Space
+                game.DisplayBoard();
+                game.interaction.Pause();
+
+            }
+            
+
+        }
+    }
