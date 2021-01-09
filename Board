@@ -1,0 +1,27 @@
+public sealed class Board
+    {
+        //Attributes
+        public string[] boardSpace { get; set; }
+
+        //Constructors
+
+        //The Board class was implemented as a singleton, since the program should only have one board instance.
+        //We store the unique instance of the Board in a static variable
+        static private Board board = new Board();
+        //We allow the user to access our unique Board instance
+        public static Board Instance { get => board; }
+
+        //The constructor is private to ensure the uniqueness of the Board
+        private Board()
+        {
+            boardSpace = new string[40];
+            for (int i = 0; i < 40; i++)
+            {
+                boardSpace[i] = Convert.ToString(i);
+            }
+        }
+
+        //Methods
+        
+
+    }
