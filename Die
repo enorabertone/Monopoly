@@ -1,0 +1,20 @@
+public class Die
+    {
+        //Attributes
+        public int value { get; set; }
+        public Random random { get; set; }
+
+        //Constructors
+        public Die()
+        {
+            random = new Random();
+            value = -1; //Not used yet
+        }
+
+        //Methods
+        public int Roll()
+        {
+            value = random.Next(1, 7);
+            return value;
+        }
+    }
