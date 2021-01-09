@@ -1,0 +1,118 @@
+public sealed class Game
+    {
+        //Attributes
+        public Board board { get; set; }
+        public List<Player> players { get; set; }
+        public UserInteraction interaction = new UserInteraction();
+        public Random random = new Random();
+        public Die dice { get; set; }
+        public bool endParty { get; set; }
+
+        //Constructors
+
+        //The Game class was implemented as a singleton, since the program should only have one game instance.
+        //We store the unique instance of the Game in a static variable
+        static private Game game = new Game();
+        //We allow the user to access our unique Game instance
+        public static Game Instance { get => game; }
+
+        //The constructor is private to ensure the uniqueness of the Game
+        private Game()
+        {
+            board = Board.Instance;
+            players = new List<Player>();
+            InitializationPlayers();
+            dice = new Die();
+            endParty = false;
+        }
+
+        //Methods
+
+        //Initialization
+        public void InitializationPlayers()
+        {
+            bool anotherPlayer = true;
+            while(anotherPlayer)
+            {
+                Console.Clear();
+                Console.WriteLine($"Player {players.Count + 1} :");
+                string playerName = interaction.StringAnswer("What is your name ?");
+                Player player = new Player(players.Count + 1, playerName, this);
+                players.Add(player);
+                Console.WriteLine($"You are the player number {players.Count}, and displayed as the " + (char)(player.id +64) + $" symbol. You start at position {player.position}.\n");
+                interaction.Pause();
+
+                if (players.Count >= 8)
+                    break;
+
+                if (players.Count >= 2)
+                    anotherPlayer = interaction.GetConfirmation("Do you want to add another player ?");
+            } 
+        }
+
+        //Launch the game
+        public void BeginParty()
+        {
+            while(!endParty)
+            {
+                foreach (Player player in new List<Player>(players)) //For not break the loop when we delete the player
+                {
+                    Console.WriteLine($"{player.name}, it's your turn. You're position {player.position}");
+                    interaction.Pause();
+                    DisplayBoard();
+                    player.PlayTurn();
+                }
+
+            }
+        }
+        
+        //Display
+        public void DisplayBoard()
+        {
+            //Display the first line with the number of the case
+            for (int i = 0; i < board.boardSpace.Length; i++)
+            {
+                Console.Write(board.boardSpace[i]);
+                if (i < 10)
+                    Console.Write(" ");
+                if (i < board.boardSpace.Length - 1)
+                    Console.Write(" |");
+            }
+            Console.WriteLine();
+
+            //Display the players
+            List<Player> playersToDisplay = new List<Player>(game.players);
+            int displayedCount;
+            //While there are still players, we display an additional line with these players.
+            while (playersToDisplay.Count > 0)
+            {
+                for (int spaceNumber = 0; spaceNumber < board.boardSpace.Length; spaceNumber++)
+                {
+                    displayedCount = 0;
+                    List<Player> playersOnThisSpace = playersToDisplay.FindAll(player => player.position == spaceNumber);
+                    foreach (Player player in playersOnThisSpace)
+                    {
+                        displayedCount++;
+                        Console.Write((char)(player.id + 64));
+                        playersToDisplay.Remove(player);
+                        if (displayedCount >= 3)
+                        {
+                            break;
+                        }
+                    }
+                    while (displayedCount < 3)
+                    {
+                        Console.Write(" ");
+                        displayedCount++;
+                    }
+                    if (spaceNumber < board.boardSpace.Length - 1)
+                    {
+                        Console.Write("|");
+                    }
+                }
+                Console.WriteLine();
+            }
+            
+        }
+        
+    }
