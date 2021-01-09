@@ -1,0 +1,11 @@
+class Program
+    {
+        static void Main(string[] args)
+        {
+            //Board.Instance.Display();
+            Game.Instance.DisplayBoard();
+            Game.Instance.BeginParty();
+
+            Console.ReadKey();
+        }
+    }
