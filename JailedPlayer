@@ -1,0 +1,60 @@
+public class JailedPlayer : IPlayer
+    {
+        readonly private Player player;
+        private int turnInJail = 0;
+
+        public JailedPlayer(Player player)
+        {
+            this.player = player;
+        }
+
+        //Reinitialize player attributes
+        public int id => player.id;
+        public string name => player.name;
+        public int position => player.position;
+        public Game game => player.game;
+
+        /// <summary>
+        /// Methods not usefull as a jailed player
+        /// </summary>
+        /// <param name="number"></param>
+        public void Move(int number)
+        {
+            Console.WriteLine("You are in jail. It's not possible to move !");
+        }
+
+        /// <summary>
+        /// Methods not usefull as a jailed player
+        /// </summary>
+        public void GoToJail()
+        {
+            Console.WriteLine("You are already in jail !");
+        }
+
+        /// <summary>
+        /// Methods allowing to play the player turn when he is in jail
+        /// </summary>
+        public void PlayTurn()
+        {
+            turnInJail++;
+            Console.WriteLine($"You are in jail ! For escape roll a double or pass three turn --> turn {turnInJail} in jail.");
+
+            //Roll dices
+            int firstDie = game.dice.Roll();
+            int secondDie = game.dice.Roll();
+            Console.WriteLine($"You rolled a {firstDie} and {secondDie} --> {firstDie + secondDie}\n");
+            Console.ReadKey();
+
+            if (firstDie == secondDie || turnInJail == 3)
+            {
+                Console.WriteLine($"You can go out of jail ! You move with dice value of {firstDie + secondDie}");
+                //Replace the player from the player list
+                int playerIndex = game.players.IndexOf(this);
+                game.players[playerIndex] = player;
+
+                player.Move(firstDie + secondDie);
+            }
+            else
+                Console.WriteLine("You can't escape the jail wait next turn !");
+        }
+    }
