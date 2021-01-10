@@ -1,81 +1,50 @@
 public class UserInteraction
     {
+        /// <summary>
+        /// Methods for have a string answer to a question
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public string StringAnswer(string message)
         {
             Console.WriteLine(message);
             return Console.ReadLine();
         }
-
-        public void Pause()
-        {
-            Console.WriteLine("Press any key to continue");
-            Console.ReadKey();
-        }
         
-
+        /// <summary>
+        /// Methods for have a "yes or no" answer to a question 
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public bool GetConfirmation(string message = "Do you want to continue ?")
         {
-            return GetObjectChoice<bool>(message, new bool[] { true, false }, new string[] { "Yes", "No" });
-        }
+            bool response = false;
+            bool correctAnswer = false;
+            string stringRes = "";
 
-        public T GetObjectChoice<T>(string message, IList<T> choicesList, IList<string> choicesTitlesList = null)
-        {
-            T choosedObject = default(T);
-            if (choicesList.Count == 0)
+            while(!correctAnswer)
             {
-                choicesList = new[] { default(T) };
-                choicesTitlesList = new[] { "No choice available. Return." };
-            }
-            if (choicesTitlesList == null)
-            {
-                choicesTitlesList = new string[choicesList.Count];//New list with the same length as the number of choices
-                for (int i = 0; i < choicesList.Count; i++)
-                {
-                    choicesTitlesList[i] = choicesList[i].ToString();
-                }
-            }
-            int choice = GetChoosedInt(message, choicesTitlesList);
-            choosedObject = choicesList[choice]; //The object chosen is the object corresponding to the number chosen in the list by the user. 
-            return choosedObject;
-        }
+                Console.Clear();
+                Console.WriteLine(message);
+                Console.WriteLine("1 _ Yes \n2 _ No");
+                Console.WriteLine("Make a choice >");
+                stringRes = Console.ReadLine();
 
-        public int GetChoosedInt(string message, IList<string> choicesTitlesList)
-        {
-            string response;
-            bool valid = false;
-            int choice = 0;
-            DisplayObjectList<string>(message, choicesTitlesList);
-            Console.WriteLine("Make a choice >");
-
-            do
-            {
-                response = Console.ReadLine();
-                try
+                if (stringRes == "1")
                 {
-                    choice = Convert.ToInt32(response);
-                    valid = true;
-                    if (choice <= 0 || choice > choicesTitlesList.Count)
-                    {
-                        valid = false;
-                        Console.WriteLine("Invalid choice, choose an existing option>");
-                    }
-                }
-                catch
-                {
-                    Console.WriteLine("Invalid input, enter an integer please.");
+                    response = true;
+                    correctAnswer = true;
                 }
 
-            } while (!valid);//We ask it as long as the input is invalid.
+                if (stringRes == "2")
+                {
+                    response = false;
+                    correctAnswer = true;
+                }
 
-            return choice - 1; //-1 to put the choice in a range of index between 0 and length-1
-        }
-
-        public void DisplayObjectList<T>(string message, IList<T> objectList)
-        {
-            Console.WriteLine(message);
-            for (int index = 0; index < objectList.Count; index++)
-            {
-                Console.WriteLine($"{index + 1} - {objectList[index]}");
             }
+            return response;
         }
+
+        
     }
