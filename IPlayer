@@ -1,0 +1,11 @@
+public interface IPlayer
+    {
+        int id { get; }
+        string name { get; }
+        int position { get; }
+        Game game { get; }
+
+        void Move(int number);
+        void GoToJail();
+        void PlayTurn();
+    }
