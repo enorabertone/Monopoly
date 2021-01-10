@@ -2,25 +2,24 @@ public sealed class Game
     {
         //Attributes
         public Board board { get; set; }
-        public List<Player> players { get; set; }
+        public List<IPlayer> players { get; set; }
         public UserInteraction interaction = new UserInteraction();
         public Random random = new Random();
         public Die dice { get; set; }
         public bool endParty { get; set; }
 
         //Constructors
-
-        //The Game class was implemented as a singleton, since the program should only have one game instance.
-        //We store the unique instance of the Game in a static variable
+        //We want to only have one game instance, so we implemented the class as a singleton.
+        //Store the unique instance of the Game in a static variable
         static private Game game = new Game();
-        //We allow the user to access our unique Game instance
+        //Allow the user to access our unique Game instance
         public static Game Instance { get => game; }
 
-        //The constructor is private to ensure the uniqueness of the Game
+        //Ensure the uniqueness of the Game
         private Game()
         {
             board = Board.Instance;
-            players = new List<Player>();
+            players = new List<IPlayer>();
             InitializationPlayers();
             dice = new Die();
             endParty = false;
@@ -28,7 +27,9 @@ public sealed class Game
 
         //Methods
 
-        //Initialization
+        /// <summary>
+        /// Methods that initilize the players present in the game before starting the party
+        /// </summary>
         public void InitializationPlayers()
         {
             bool anotherPlayer = true;
@@ -39,8 +40,8 @@ public sealed class Game
                 string playerName = interaction.StringAnswer("What is your name ?");
                 Player player = new Player(players.Count + 1, playerName, this);
                 players.Add(player);
-                Console.WriteLine($"You are the player number {players.Count}, and displayed as the " + (char)(player.id +64) + $" symbol. You start at position {player.position}.\n");
-                interaction.Pause();
+                Console.WriteLine($"Player {players.Count}: {player.name}. You are displayed as the " + (char)(player.id +64) + $" symbol. You start at position {player.position}.\n");
+                Console.ReadKey();
 
                 if (players.Count >= 8)
                     break;
@@ -49,24 +50,30 @@ public sealed class Game
                     anotherPlayer = interaction.GetConfirmation("Do you want to add another player ?");
             } 
         }
-
-        //Launch the game
+        
+        /// <summary>
+        /// Methods that start the party
+        /// </summary>
         public void BeginParty()
         {
+            Console.Clear();
             while(!endParty)
             {
-                foreach (Player player in new List<Player>(players)) //For not break the loop when we delete the player
+                foreach (IPlayer player in new List<IPlayer>(players))
                 {
                     Console.WriteLine($"{player.name}, it's your turn. You're position {player.position}");
-                    interaction.Pause();
                     DisplayBoard();
                     player.PlayTurn();
+                    Console.ReadKey();
+                    Console.Clear();
                 }
 
             }
         }
         
-        //Display
+        /// <summary>
+        /// Methods for display the board with players' position
+        /// </summary>
         public void DisplayBoard()
         {
             //Display the first line with the number of the case
@@ -81,7 +88,7 @@ public sealed class Game
             Console.WriteLine();
 
             //Display the players
-            List<Player> playersToDisplay = new List<Player>(game.players);
+            List<IPlayer> playersToDisplay = new List<IPlayer>(game.players);
             int displayedCount;
             //While there are still players, we display an additional line with these players.
             while (playersToDisplay.Count > 0)
@@ -89,8 +96,8 @@ public sealed class Game
                 for (int spaceNumber = 0; spaceNumber < board.boardSpace.Length; spaceNumber++)
                 {
                     displayedCount = 0;
-                    List<Player> playersOnThisSpace = playersToDisplay.FindAll(player => player.position == spaceNumber);
-                    foreach (Player player in playersOnThisSpace)
+                    List<IPlayer> playersOnThisSpace = playersToDisplay.FindAll(player => player.position == spaceNumber);
+                    foreach (IPlayer player in playersOnThisSpace)
                     {
                         displayedCount++;
                         Console.Write((char)(player.id + 64));
