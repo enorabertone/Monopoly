@@ -1,4 +1,4 @@
-public class Player
+public class Player : IPlayer
     {
         //Attributes
         public int id { get; set; }
@@ -16,6 +16,10 @@ public class Player
         }
 
         //Methods
+        /// <summary>
+        /// Methods for moving forward on the board after rolling dice.
+        /// </summary>
+        /// <param name="number"></param>
         public void Move(int number)
         {
             position += number;
@@ -25,9 +29,25 @@ public class Player
             }
         }
 
+        /// <summary>
+        /// Methods when the player have to go in jail (3 times double or Go To Jail board space)
+        /// Using decorator pattern for change the behavior of the player
+        /// </summary>
+        public void GoToJail()
+        {
+            Console.WriteLine("You go straight to jail !");
+            position = 10;
+            JailedPlayer jailedPlayer = new JailedPlayer(this);
+            //Replace the player from the player list
+            int playerIndex = game.players.IndexOf(this);
+            game.players[playerIndex] = jailedPlayer;
+        }
+
+        /// <summary>
+        /// Methods make the player plays its turn
+        /// </summary>
         public void PlayTurn()
         {
-            Console.Clear();
             bool replay = true;
             int doubleCounter = 0;
 
@@ -37,7 +57,7 @@ public class Player
                 int firstDie = game.dice.Roll();
                 int secondDie = game.dice.Roll();
                 Console.WriteLine($"You rolled a {firstDie} and {secondDie} --> {firstDie + secondDie}\n");
-                game.interaction.Pause();
+                Console.ReadKey();
 
                 //Verify if it's a double
                 if (firstDie == secondDie)
@@ -46,8 +66,8 @@ public class Player
 
                     if (doubleCounter == 3)
                     {
-                        Console.WriteLine("You've made three double in a row : You're going straight to jail !");
-                        // Go to Jail action
+                        Console.WriteLine("You've made three double in a row.");
+                        GoToJail();
                         replay = false;
                         return;
                     }
@@ -62,9 +82,18 @@ public class Player
                 Move(firstDie + secondDie);
                 Console.WriteLine("New position: " + position);
 
-                //Do the action on the Board Space
+                //Verify if we are on the Go To Jail board space
+                if(position == 30)
+                {
+                    Console.WriteLine("This is the case 30 : Go To Jail !");
+                    GoToJail();
+                    replay = false;
+                    return;
+                }
+
+                //Display the board
                 game.DisplayBoard();
-                game.interaction.Pause();
+                Console.ReadKey();
 
             }
             
